@@ -1,16 +1,23 @@
 <script setup>
-import { ref } from 'vue';
-
-const count = ref(0);
-
-function increment() {
-  count.value++;
-}
-
+defineProps({
+  title: String,
+  price: Number,
+  isAdded: Boolean,
+})
 </script>
 
 <template>
-  <h1>{{ count }}</h1>
-  <button @click="increment">+</button>
-  <input @keyup.ctrl.enter="increment" />
+  <div class="product">
+    <h2>Товар: {{ title }}</h2>
+    <h3>Цена: {{ price }}</h3>
+    <h3>Добавлен: {{ isAdded }}</h3>
+  </div>
 </template>
+
+<style scoped>
+.product {
+  border: 1px solid blue;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+</style>
