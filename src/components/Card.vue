@@ -23,7 +23,7 @@ defineProps({
     <img :src="imageUrl" alt="Sneaker" />
     <p class="mt-2">{{ title }}</p>
 
-    <div class="flex justify-between">
+    <div class="flex justify-between items-end">
       <div class="flex flex-col">
         <span class="text-slate-400">Цена:</span>
         <b>{{ price }} UAH</b>
