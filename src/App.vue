@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, reactive } from 'vue'
 import axios from 'axios'
 
 import Header from './components/Header.vue'
@@ -7,11 +7,13 @@ import CardList from './components/CardList.vue'
 import Drawer from './components/Drawer.vue'
 
 const items = ref([])
-const sortBy = ref('')
-const searchQuery = ref('')
+const filters = reactive({
+  sortBy: '',
+  searchQuery: '',
+})
 
 const onChangeSelect = event => {
-  sortBy.value = event.target.value;
+  filters.sortBy = event.target.value;
 }
 
 onMounted(async () => {
@@ -24,10 +26,10 @@ onMounted(async () => {
   }
 })
 
-watch(sortBy, async () => {
+watch(filters, async () => {
   try {
     const { data } = await axios.get(
-      'https://fa58b7fdb36d538b.mokky.dev/items?sortBy=' + sortBy.value,
+      'https://fa58b7fdb36d538b.mokky.dev/items?sortBy=' + filters.sortBy,
     )
 
     items.value = data
