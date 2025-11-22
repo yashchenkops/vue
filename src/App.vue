@@ -11,12 +11,15 @@ const cart = ref([]);
 const isCreatingOrder = ref(false);
 const drawerOpen = ref(false);
 
+const filters = reactive({
+  sortBy: 'title',
+  searchQuery: '',
+});
+
 const totalPrice = computed(() => cart.value.reduce((acc, item) => acc + item.price, 0));
 const vatPrice = computed(() => Math.round((totalPrice.value * 5) / 100));
-
-const cartButtonDisabled = computed(() =>
-  isCreatingOrder.value ? true : totalPrice.value ? false : true
-);
+const cartIsEmpty = computed(() => cart.value.length === 0);
+const cartButtonDisabled = computed(() => isCreatingOrder.value || cartIsEmpty.value);
 
 const closeDrawer = () => {
   drawerOpen.value = false;
@@ -25,11 +28,6 @@ const closeDrawer = () => {
 const openDrawer = () => {
   drawerOpen.value = true;
 };
-
-const filters = reactive({
-  sortBy: 'title',
-  searchQuery: '',
-});
 
 const addToCart = (item) => {
   cart.value.push(item);
@@ -147,6 +145,13 @@ onMounted(async () => {
 });
 
 watch(filters, fetchItems);
+
+watch(cart, () => {
+  items.value = items.value.map((item) => ({
+    ...item,
+    isAdded: false
+  }))
+});
 
 provide('cart', {
   cart,
