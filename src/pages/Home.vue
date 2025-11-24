@@ -33,6 +33,7 @@ const addToFavorite = async (item) => {
     if (!item.isFavorite) {
       const obj = {
         parentId: item.id,
+        item
       };
       item.isFavorite = true;
 
