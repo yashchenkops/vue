@@ -1,18 +1,41 @@
 <script setup>
-import { inject } from 'vue';
+import { ref, computed, inject } from 'vue';
+import axios from 'axios';
 
 import DrawerHead from './DrawerHead.vue';
 import CartItemList from './CartItemList.vue';
 import InfoBlock from './InfoBlock.vue';
 
-const { closeDrawer } = inject('cart');
-const emit = defineEmits(['createOrder']);
-
-defineProps({
+const props = defineProps({
   totalPrice: Number,
   vatPrice: Number,
-  buttonDisabled: Boolean,
 });
+
+const { cart, closeDrawer } = inject('cart');
+
+const isCreating = ref(false);
+const orderId = ref(null);
+
+const createOrder = async () => {
+  try {
+    isCreating.value = true;
+    const { data } = await axios.post('https://fa58b7fdb36d538b.mokky.dev/orders', {
+      items: cart.value,
+      totalPrice: props.totalPrice.value,
+    });
+
+    cart.value = [];
+
+    orderId.value = data.id;
+  } catch (err) {
+    console.log(err);
+  } finally {
+    isCreating.value = false;
+  }
+};
+
+const cartIsEmpty = computed(() => cart.value.length === 0);
+const buttonDisabled = computed(() => isCreating.value || cartIsEmpty.value);
 </script>
 
 <template>
@@ -21,7 +44,14 @@ defineProps({
     <DrawerHead />
 
     <InfoBlock
-      v-if="!totalPrice"
+      v-if="orderId"
+      title="Заказ оформлен"
+      :description="`Ваш заказ #${orderId} скоро будет переданн курьерской доставке`"
+      image-url="/order-success-icon.png"
+    />
+
+    <InfoBlock
+      v-if="!totalPrice && !orderId"
       title="Корзина пустая"
       description="Добавьте хотя бы одну пару кроссовок, чтобы сделать заказ"
       image-url="/package-icon.png"
@@ -43,7 +73,7 @@ defineProps({
       <button
         class="mt-4 transition bg-lime-500 w-full rounded-xl py-3 text-white disabled:bg-slate-300 cursor-pointer hover:bg-lime-600 active:bg-lime-700"
         :disabled="buttonDisabled"
-        @click="() => emit('createOrder')"
+        @click="createOrder"
       >
         Оформить заказ
       </button>
